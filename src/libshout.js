@@ -65,11 +65,11 @@ class Shout {
 
 	/* ----- Managing Connections ----- */
 	open() {
-		return handleErrors(c.shout_open(this.pointer))
+		handleErrors(c.shout_open(this.pointer))
 	}
 
 	close() {
-		return handleErrors(c.shout_close(this.pointer))
+		handleErrors(c.shout_close(this.pointer))
 	}
 
 	getConnected() {
@@ -86,11 +86,11 @@ class Shout {
 
 	/* ----- Sending Data ----- */
 	send(data) {
-		return handleErrors(c.shout_send(this.pointer, data, data.length))
+		handleErrors(c.shout_send(this.pointer, data, data.length))
 	}
 
 	sendRaw(data) {
-		return handleErrors(c.shout_send_raw(this.pointer, data, data.length))
+		handleErrors(c.shout_send_raw(this.pointer, data, data.length))
 	}
 
 	sync() {
@@ -115,7 +115,7 @@ class Shout {
 	}
 
 	setHost(host) {
-		return handleErrors(c.shout_set_host(this.pointer, host))
+		handleErrors(c.shout_set_host(this.pointer, host))
 	}
 
 	getHost() {
@@ -123,7 +123,7 @@ class Shout {
 	}
 
 	setPort(port) {
-		return handleErrors(c.shout_set_port(this.pointer, port))
+		handleErrors(c.shout_set_port(this.pointer, port))
 	}
 
 	getPort() {
@@ -131,7 +131,7 @@ class Shout {
 	}
 
 	setUser(user) {
-		return handleErrors(c.shout_set_user(this.pointer, user))
+		handleErrors(c.shout_set_user(this.pointer, user))
 	}
 
 	getUser() {
@@ -139,7 +139,7 @@ class Shout {
 	}
 
 	setPassword(pass) {
-		return handleErrors(c.shout_set_password(this.pointer, pass))
+		handleErrors(c.shout_set_password(this.pointer, pass))
 	}
 
 	getPassword() {
@@ -151,7 +151,7 @@ class Shout {
 		if (typeof protocol === 'string') {
 			protocol = PROTOCOLS[protocol]
 		}
-		return handleErrors(c.shout_set_protocol(this.pointer, protocol))
+		handleErrors(c.shout_set_protocol(this.pointer, protocol))
 	}
 
 	getProtocol() {
@@ -163,7 +163,7 @@ class Shout {
 		if (typeof format === 'string') {
 			format = FORMATS[format]
 		}
-		return handleErrors(c.shout_set_format(this.pointer, format))
+		handleErrors(c.shout_set_format(this.pointer, format))
 	}
 
 	getFormat() {
@@ -171,7 +171,7 @@ class Shout {
 	}
 
 	setMount(mountPoint) {
-		return handleErrors(c.shout_set_mount(this.pointer, mountPoint))
+		handleErrors(c.shout_set_mount(this.pointer, mountPoint))
 	}
 
 	getMount() {
@@ -179,7 +179,7 @@ class Shout {
 	}
 
 	setDumpfile(dumpfile) {
-		return handleErrors(c.shout_set_dumpfile(this.pointer, dumpfile))
+		handleErrors(c.shout_set_dumpfile(this.pointer, dumpfile))
 	}
 
 	getDumpfile() {
@@ -187,7 +187,7 @@ class Shout {
 	}
 
 	setAgent(agent) {
-		return handleErrors(c.shout_set_agent(this.pointer, agent))
+		handleErrors(c.shout_set_agent(this.pointer, agent))
 	}
 
 	getAgent() {
@@ -199,7 +199,7 @@ class Shout {
 		if (typeof mode === 'string') {
 			mode = TLS[mode]
 		}
-		return handleErrors(c.shout_set_tls(this.pointer, mode))
+		handleErrors(c.shout_set_tls(this.pointer, mode))
 	}
 
 	getTls() {
@@ -207,7 +207,7 @@ class Shout {
 	}
 
 	setCaDirectory(directory) {
-		return handleErrors(c.shout_set_ca_directory(this.pointer, directory))
+		handleErrors(c.shout_set_ca_directory(this.pointer, directory))
 	}
 
 	getCaDirectory() {
@@ -215,7 +215,7 @@ class Shout {
 	}
 
 	setCaFile(file) {
-		return handleErrors(c.shout_set_ca_file(this.pointer, file))
+		handleErrors(c.shout_set_ca_file(this.pointer, file))
 	}
 
 	getCaFile() {
@@ -223,7 +223,7 @@ class Shout {
 	}
 
 	setCiphers(ciphers) {
-		return handleErrors(c.shout_set_allowed_ciphers(this.pointer, ciphers))
+		handleErrors(c.shout_set_allowed_ciphers(this.pointer, ciphers))
 	}
 
 	getCiphers() {
@@ -231,7 +231,7 @@ class Shout {
 	}
 
 	setClientCert(certificate) {
-		return handleErrors(c.shout_set_client_certificate(this.pointer, certificate))
+		handleErrors(c.shout_set_client_certificate(this.pointer, certificate))
 	}
 
 	getClientCert() {
@@ -240,7 +240,7 @@ class Shout {
 
 	/* ----- Directory Parameters ----- */
 	setPublic(makepublic) {
-		return handleErrors(c.shout_set_public(this.pointer, +makepublic))
+		handleErrors(c.shout_set_public(this.pointer, +makepublic))
 	}
 
 	getPublic() {
@@ -251,7 +251,7 @@ class Shout {
 	// These get sent as headers prefaced with "icy-", and can be any string, not just those
 	// defined in META.
 	setMeta(name, value) {
-		return handleErrors(c.shout_set_meta(this.pointer, name, value))
+		handleErrors(c.shout_set_meta(this.pointer, name, value))
 	}
 
 	getMeta(name) {
