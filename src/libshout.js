@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 const c = require('./bindings')
+const weak = require('weak-napi')
 const Writable = require('stream').Writable
 const {
 	ERRORS, PROTOCOLS, FORMATS, AUDIOINFO, META, TLS,
@@ -29,14 +30,16 @@ const getVersion = () => {
 class Metadata {
 	constructor() {
 		this.pointer = c.shout_metadata_new()
-	}
-
-	free() {
-		c.shout_metadata_free(this.pointer)
+		if (this.pointer === null) {
+			throw new Error("Could not allocate shout_metadata_t")
+		}
+		weak(this, () => {
+			c.shout_metadata_free(this.pointer)
+		})
 	}
 
 	add(keyOrObject, value) {
-		return setSingleOrMulti(this.pointer, keyOrObject, value, c.shout_metadata_add)
+		setSingleOrMulti(this.pointer, keyOrObject, value, c.shout_metadata_add)
 	}
 }
 
@@ -44,10 +47,16 @@ class Shout {
 	constructor() {
 		c.shout_init()
 		this.pointer = c.shout_new()
+		if (this.pointer === null) {
+			throw new Error("Could not allocate shout_t")
+		}
+		weak(this, () => {
+			c.shout_free(this.pointer)
+		})
 		const ls = this
 		this.writeStream = new Writable({
 			write(data, encoding, cb) {
-				ls.send(data, data.length)
+				ls.send(data)
 				const delay = ls.getDelay()
 				setTimeout(() => cb(), delay)
 			},
@@ -55,10 +64,6 @@ class Shout {
 	}
 
 	/* ----- Managing Connections ----- */
-	free() {
-		c.shout_free(this.pointer)
-	}
-
 	open() {
 		return handleErrors(c.shout_open(this.pointer))
 	}
@@ -80,12 +85,12 @@ class Shout {
 	}
 
 	/* ----- Sending Data ----- */
-	send(data, len) {
-		return handleErrors(c.shout_send(this.pointer, data, len))
+	send(data) {
+		return handleErrors(c.shout_send(this.pointer, data, data.length))
 	}
 
-	sendRaw(data, len) {
-		return handleErrors(c.shout_send_raw(this.pointer, data, len))
+	sendRaw(data) {
+		return handleErrors(c.shout_send_raw(this.pointer, data, data.length))
 	}
 
 	sync() {
