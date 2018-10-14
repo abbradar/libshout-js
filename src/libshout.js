@@ -5,6 +5,26 @@ const {
 	ERRORS, PROTOCOLS, FORMATS, AUDIOINFO, META, TLS,
 } = require('./constants')
 
+const handleErrors = (code) => {
+	if (code < 0) {
+		throw new Error(ERRORS[code])
+	}
+	return code
+}
+
+const setSingleOrMulti = (pointer, keyOrObject, value, func) => {
+	if (typeof keyOrObject === 'string') {
+		handleErrors(func(pointer, keyOrObject, value))
+	} else {
+		Object.entries(keyOrObject).forEach(kv => {
+			handleErrors(func(pointer, kv[0], kv[1]))
+		})
+	}
+}
+
+const getVersion = () => {
+	return c.shout_version(null, null, null)
+}
 
 class Metadata {
 	constructor() {
@@ -20,7 +40,7 @@ class Metadata {
 	}
 }
 
-class Libshout {
+class Shout {
 	constructor() {
 		c.shout_init()
 		this.pointer = c.shout_new()
@@ -32,14 +52,6 @@ class Libshout {
 				setTimeout(() => cb(), delay)
 			},
 		})
-	}
-
-	static get version() {
-		return c.shout_version(Buffer.alloc(0), Buffer.alloc(0), Buffer.alloc(0))
-	}
-
-	static shutdown() {
-		c.shout_shutdown()
 	}
 
 	/* ----- Managing Connections ----- */
@@ -250,41 +262,19 @@ class Libshout {
 		return AUDIOINFO[c.shout_get_audio_info(this.pointer, name)]
 	}
 
-	/* ----- Metadata (MP3 Only) ----- */
-	static createMetadata() {
-		return new Metadata()
-	}
-
 	// Metadata for the TRACK, not for the stream
 	setMetadata(metadata) {
-		return handleErrors(c.shout_set_metadata(this.pointer, metadata.pointer))
+		handleErrors(c.shout_set_metadata(this.pointer, metadata.pointer))
 	}
 }
 
-function handleErrors(code) {
-	if (code !== 0) {
-		throw new Error(ERRORS[code])
-	}
-	return code
-}
-
-function setSingleOrMulti(pointer, keyOrObject, value, func) {
-	if (typeof keyOrObject === 'string') {
-		return handleErrors(func(pointer, keyOrObject, value))
-	} else {
-		Object.entries(keyOrObject).forEach(kv => {
-			handleErrors(func(pointer, kv[0], kv[1]))
-		})
-	}
-	return ERRORS[0]
-}
-
-Libshout.CONST = {
+module.exports = {
 	PROTOCOLS,
 	FORMATS,
 	META,
 	AUDIOINFO,
 	ERRORS,
+	getVersion,
+	Metadata,
+	Shout,
 }
-
-module.exports = Libshout
