@@ -2,15 +2,25 @@
 const c = require('./bindings')
 const weak = require('weak-napi')
 const Writable = require('stream').Writable
+const util = require('util')
 const {
 	ERRORS, PROTOCOLS, FORMATS, AUDIOINFO, META, TLS,
 } = require('./constants')
+
+c.shout_send.promise = util.promisify(c.shout_send.async)
+c.shout_send_raw.promise = util.promisify(c.shout_send_raw.async)
+c.shout_open.promise = util.promisify(c.shout_open.async)
+c.shout_close.promise = util.promisify(c.shout_close.async)
 
 const handleErrors = (code) => {
 	if (code < 0) {
 		throw new Error(ERRORS[code])
 	}
 	return code
+}
+
+const handleVoidErrors = (code) => {
+	handleErrors(code)
 }
 
 const setSingleOrMulti = (pointer, keyOrObject, value, func) => {
@@ -56,20 +66,18 @@ class Shout {
 		const ls = this
 		this.writeStream = new Writable({
 			write(data, encoding, cb) {
-				ls.send(data)
-				const delay = ls.getDelay()
-				setTimeout(() => cb(), delay)
+				ls.send(data).then(() => ls.sync()).then(() => cb(null)).catch(cb)
 			},
 		})
 	}
 
 	/* ----- Managing Connections ----- */
 	open() {
-		handleErrors(c.shout_open(this.pointer))
+		return c.shout_open.promise(this.pointer).then(handleVoidErrors)
 	}
 
 	close() {
-		handleErrors(c.shout_close(this.pointer))
+		return c.shout_close.promise(this.pointer).then(handleVoidErrors)
 	}
 
 	getConnected() {
@@ -86,15 +94,16 @@ class Shout {
 
 	/* ----- Sending Data ----- */
 	send(data) {
-		handleErrors(c.shout_send(this.pointer, data, data.length))
+		return c.shout_send.promise(this.pointer, data, data.length).then(handleVoidErrors)
 	}
 
 	sendRaw(data) {
-		handleErrors(c.shout_send_raw(this.pointer, data, data.length))
+		return c.shout_send_raw.promise(this.pointer, data, data.length).then(handleVoidErrors)
 	}
 
 	sync() {
-		c.shout_sync(this.pointer)
+		const delay = this.getDelay()
+		return new Promise((resolve) => setTimeout(resolve, delay))
 	}
 
 	getDelay() {
@@ -106,14 +115,6 @@ class Shout {
 	}
 
 	/* ----- Connection Parameters ----- */
-	setNonblocking(nonblocking) {
-		return handleErrors(c.shout_set_nonblocking(this.pointer, nonblocking))
-	}
-
-	getNonblocking() {
-		return c.shout_get_nonblocking(this.pointer)
-	}
-
 	setHost(host) {
 		handleErrors(c.shout_set_host(this.pointer, host))
 	}
