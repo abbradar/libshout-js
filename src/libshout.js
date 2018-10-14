@@ -63,8 +63,12 @@ class Shout {
 		weak(this, () => {
 			c.shout_free(this.pointer)
 		})
+	}
+
+	/* ----- Streams ----- */
+	createStream() {
 		const ls = this
-		this.writeStream = new Writable({
+		return new Writable({
 			write(data, encoding, cb) {
 				ls.send(data).then(() => ls.sync()).then(() => cb(null)).catch(cb)
 			},
