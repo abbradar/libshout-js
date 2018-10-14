@@ -7,7 +7,7 @@ const shout_metadata = ref.types.void
 const shout_tP = ptr(shout_t)
 const shout_metadataP = ptr(shout_metadata)
 
-module.exports = (path = 'libshout') => new ffi.Library(path, {
+module.exports = new ffi.Library("libshout", {
 	// functionSymbol: [ returnType, [ arg1Type, arg2Type, ... ], ... ]
 
 	/* ----- Global functions ------ */

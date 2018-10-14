@@ -1,10 +1,9 @@
 /* eslint-disable no-param-reassign */
-const cInitializer = require('./bindings')
+const c = require('./bindings')
 const Writable = require('stream').Writable
 const {
 	ERRORS, PROTOCOLS, FORMATS, AUDIOINFO, META, TLS,
 } = require('./constants')
-let c = null
 
 
 class Metadata {
@@ -22,8 +21,7 @@ class Metadata {
 }
 
 class Libshout {
-	constructor(filepath) {
-		c = cInitializer(filepath)
+	constructor() {
 		c.shout_init()
 		this.pointer = c.shout_new()
 		const ls = this
