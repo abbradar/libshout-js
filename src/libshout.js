@@ -68,9 +68,20 @@ class Shout {
 	/* ----- Streams ----- */
 	createStream() {
 		const ls = this
+		// Taken from ezstream source.
+		const chunkSize = 4096
 		return new Writable({
+			highWaterMark: chunkSize,
 			write(data, encoding, cb) {
-				ls.send(data).then(() => ls.sync()).then(() => cb(null)).catch(cb)
+				const sendAll = async () => {
+					while (data.length > 0) {
+						await ls.sync()
+						await ls.send(data.slice(0, chunkSize))
+						data = data.slice(chunkSize)
+					}
+					cb(null)
+				}
+				sendAll().catch(cb)
 			},
 		})
 	}
