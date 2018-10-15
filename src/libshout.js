@@ -11,6 +11,7 @@ c.shout_send.promise = util.promisify(c.shout_send.async)
 c.shout_send_raw.promise = util.promisify(c.shout_send_raw.async)
 c.shout_open.promise = util.promisify(c.shout_open.async)
 c.shout_close.promise = util.promisify(c.shout_close.async)
+c.shout_set_metadata.promise = util.promisify(c.shout_set_metadata.async)
 
 const handleErrors = (code) => {
 	if (code < 0) {
@@ -285,7 +286,7 @@ class Shout {
 
 	// Metadata for the TRACK, not for the stream
 	setMetadata(metadata) {
-		handleErrors(c.shout_set_metadata(this.pointer, metadata.pointer))
+		return c.shout_set_metadata.promise(this.pointer, metadata.pointer).then(handleVoidErrors)
 	}
 }
 
