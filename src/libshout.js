@@ -77,6 +77,9 @@ class Shout {
 				const sendAll = async () => {
 					while (data.length > 0) {
 						await ls.sync()
+						if(this.destroyed) {
+							break;
+						}
 						await ls.send(data.slice(0, chunkSize))
 						data = data.slice(chunkSize)
 					}
